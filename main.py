@@ -52,7 +52,8 @@ for i in range(2, sheet_main_shape[0] + 1):
     dict_token_data = cg.get_coin_by_id(id=token_name)
     dict_hist_data = cg.get_coin_market_chart_range_by_id(id=token_name, vs_currency='usd', from_timestamp=unix_time_gmt_start, to_timestamp=unix_time_gmt_end)
     # add max supply to main
-    sheet_main.range((i, 5)).value = [dict_token_data["market_data"]["max_supply"]]
+    sheet_main.range((i, 5)).value = [dict_token_data["market_data"]["total_supply"]]
+    sheet_main.range((i, 6)).value = [dict_token_data["market_data"]["max_supply"]]
     # fill token data to sheet
     sheet_token.range("A2").value = dict_hist_data["prices"]
     sheet_token.range("C2").value = dict_hist_data["market_caps"]
@@ -64,18 +65,22 @@ for i in range(2, sheet_main_shape[0] + 1):
         sheet_token.range('E' + str(k)).value = ['=D' + str(k) + '/B' + str(k)]
     sheet_token.range("C2").value = None
     # fill main sheet
-    sheet_main.range(i, 2).value = ["=" + token_name + "!D366"]
-    if sheet_main.range((i, 5)).value is None:
+    sheet_main.range(i, 2).value = ["='" + token_name + "'!D366"]
+    if sheet_main.range((i, 6)).value is None:
         print("no max supply")
     else:
-        sheet_main.range(i, 3).value = ["=E" + str(i) + "*" + token_name + "!B366"]
-    sheet_main.range(i, 4).value = ["=" + token_name + "!E366"]
-    sheet_main.range((i, 6),(i, 14)).value = ["=MIN(" + token_name + "!B:B)/MAX(" + token_name + "!B:B)-1",
-                                              "=MIN(" + token_name + "!D:D)/MAX(" + token_name + "!D:D)-1",
-                                              "=" + token_name + "!E366/" + token_name + "!E2-1",
-                                              "=CORREL(bitcoin!B:B," + token_name + "!B:B)",
-                                              "=CORREL(bitcoin!F:F," + token_name + "!F:F)",
-                                              "=STDEV.S(" + token_name + "!C3:C366)",
-                                              "=SQRT(365)*K" + str(i),
+        sheet_main.range(i, 3).value = ["=F" + str(i) + "*'" + token_name + "'!B366"]
+    if sheet_main.range((i, 5)).value is None:
+        print("no total supply")
+    else:
+        sheet_main.range(i, 7).value = ["=D" + str(i) + "/E" + str(i)]
+    sheet_main.range(i, 4).value = ["='" + token_name + "'!E366"]
+    sheet_main.range((i, 8), (i, 16)).value = ["=MIN('" + token_name + "'!B:B)/MAX('" + token_name + "'!B:B)-1",
+                                              "=MIN('" + token_name + "'!D:D)/MAX('" + token_name + "'!D:D)-1",
+                                              "='" + token_name + "'!E366/'" + token_name + "'!E2-1",
+                                              "=CORREL(bitcoin!B:B,'" + token_name + "'!B:B)",
+                                              "=CORREL(bitcoin!F:F,'" + token_name + "'!F:F)",
+                                              "=STDEV.S('" + token_name + "'!C3:C366)",
+                                              "=SQRT(365)*M" + str(i),
                                               sheet_token.range("A2").value,
                                               sheet_token.range("A366").value]
